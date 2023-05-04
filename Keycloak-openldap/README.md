@@ -34,8 +34,8 @@ You should use Linux (debian) or Windows WSL to setup this project
 # Created Users and Roles
 > - The initial script 
 >   - will setup everything and add 2 users to LDAP/Keycloak
->     - {user : 'bgates', password: '123', role: 'USER'}
->     - {user : 'sjobs', password: '123', role: 'USER'}
+>     - {user : 'bgates', password: '123', role: ['USER']}
+>     - {user : 'sjobs', password: '123', role: ['USER','ADMIN']}
 >   - will print into console some valuable information for Keycloak auth using OAuth2.0's Authorization Code Grant.
 
 
