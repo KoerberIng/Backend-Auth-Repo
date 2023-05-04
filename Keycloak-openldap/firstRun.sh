@@ -31,8 +31,16 @@ curl -i -X POST "http://$KHP/admin/realms/mbr-kps-service/clients/$CI/roles" \
 -H "Content-Type: application/json" \
 -d '{"name": "USER"}'
 
-RI=$(curl -s "http://$KHP/admin/realms/mbr-kps-service/clients/$CI/roles" \
+curl -i -X POST "http://$KHP/admin/realms/mbr-kps-service/clients/$CI/roles" \
+-H "Authorization: Bearer $AT" \
+-H "Content-Type: application/json" \
+-d '{"name": "ADMIN"}'
+
+RI1=$(curl -s "http://$KHP/admin/realms/mbr-kps-service/clients/$CI/roles" \
   -H "Authorization: Bearer $AT" | jq -r '.[0].id')
+
+RI2=$(curl -s "http://$KHP/admin/realms/mbr-kps-service/clients/$CI/roles" \
+  -H "Authorization: Bearer $AT" | jq -r '.[1].id')
 
 LDI=$(curl -si -X POST "http://$KHP/admin/realms/mbr-kps-service/components" \
   -H "Authorization: Bearer $AT" \
@@ -49,7 +57,7 @@ BGI=$(curl -s "http://$KHP/admin/realms/mbr-kps-service/users?username=bgates" \
 curl -i -X POST "http://$KHP/admin/realms/mbr-kps-service/users/$BGI/role-mappings/clients/$CI" \
   -H "Authorization: Bearer $AT" \
   -H "Content-Type: application/json" \
-  -d '[{"id":"'"$RI"'","name":"USER"}]'
+  -d '[{"id":"'"$RI1"'","name":"USER"}]'
 
 SJI=$(curl -s "http://$KHP/admin/realms/mbr-kps-service/users?username=sjobs" \
   -H "Authorization: Bearer $AT"  | jq -r '.[0].id')
@@ -57,7 +65,7 @@ SJI=$(curl -s "http://$KHP/admin/realms/mbr-kps-service/users?username=sjobs" \
 curl -i -X POST "http://$KHP/admin/realms/mbr-kps-service/users/$SJI/role-mappings/clients/$CI" \
   -H "Authorization: Bearer $AT" \
   -H "Content-Type: application/json" \
-  -d '[{"id":"'"$RI"'","name":"USER"}]'
+  -d '[{"id":"'"$RI1"'","name":"USER"},{"id":"'"$RI2"'","name":"ADMIN"}]'
 
 
 echo
