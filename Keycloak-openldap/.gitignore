@@ -1,0 +1,4 @@
+/app-web-nodejs
+import-openldap-users.sh
+init-keycloak.sh
+/.ideia

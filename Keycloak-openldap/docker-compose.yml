@@ -1,0 +1,57 @@
+version: '3.3'
+services:
+
+  postgres:
+    image: postgres:13-alpine3.16
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_ROOT_PASSWORD=root_password
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d keycloak -U keycloak" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:19.0.3
+    container_name: keycloak
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL_HOST=postgres
+      - KC_DB_URL_DATABASE=keycloak
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=password
+      - KEYCLOAK_EXTRA_ARGS_PREPENDED="--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true"
+    ports:
+      - "8081:8080"
+    command: start-dev
+    depends_on:
+      - postgres
+    healthcheck:
+      test: "curl -f http://localhost:8080/admin || exit 1"
+
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: openldap
+    environment:
+      - LDAP_ORGANISATION="Koerber Pharma Software."
+      - LDAP_DOMAIN=kps.com
+    ports:
+      - "389:389"
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:0.9.0
+    container_name: phpldapadmin
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=openldap
+    ports:
+      - "6443:443"
+    depends_on:
+      - openldap
